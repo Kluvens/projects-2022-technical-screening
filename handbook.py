@@ -22,6 +22,7 @@ with open("./conditions.json") as f:
     f.close()
 
 def beautify_conditions(conditions):
+    # this functions is about to simplified the version of data and make them into format so that it is easier to deal with
     for course in conditions:
         conditions[course] = ' '.join(conditions[course].split())
         conditions[course] = conditions[course].lower()
@@ -141,9 +142,12 @@ def check_credits(courses_list, conditions):
     return result
 
 def check_valid(courses_list, gen_list):
+    # if the student has not taken any course before he cannot learn any course except COMP1511
     if courses_list == []:
         return False
     else:
+        # if the result we received is tuple then we call check_tuple
+        # if we received list then call check_list
         if isinstance(gen_list, tuple):
             return check_tuple(courses_list, gen_list)
         elif isinstance(gen_list, list):
@@ -153,6 +157,7 @@ def check_list(courses_list, gen_list):
     result = False
     if isinstance(gen_list, tuple):
         result = check_tuple(courses_list, gen_list)
+    # if any of the course in list has been taken before then return True
     for course in gen_list:
         if isinstance(course, str):
             if course in courses_list:
@@ -162,24 +167,9 @@ def check_list(courses_list, gen_list):
                 result = True
     return result
 
-# def check_list(courses_list, gen_list):
-#     count = 0
-#     count_str = 0
-#     result = True
-#     for course in gen_list:
-#         if isinstance(course, str):
-#             count_str += 1
-#             if course not in courses_list:
-#                 count += 1
-#         elif isinstance(course, tuple):
-#             result = result and check_tuple(courses_list, course)
-#     if count == count_str:
-#         result = result and False
-#
-#     return result
-
 def check_tuple(courses_list, gen_list):
     result = True
+    # if any of the course in the tuple has not been taken before then return False
     for course in gen_list:
         if course == False:
             return False
@@ -189,34 +179,6 @@ def check_tuple(courses_list, gen_list):
         elif isinstance(course, list):
             result = result and check_list(courses_list, course)
     return result
-
-# def check_valid(courses_list, gen_list):
-#     idx = 0
-#     result = True
-#     count_maybe_courses = 0
-#     while idx < len(gen_list):
-#         if gen_list[idx] == False:
-#             result = result and False
-#         elif gen_list[idx] == True:
-#             result = result and True
-#         elif isinstance(gen_list[idx], tuple):
-#             for course in gen_list[idx]:
-#                 if isinstance(course, list):
-#                     result = result and check_valid(course)
-#                 else:
-#                     if course not in courses_list:
-#                         result = result and False
-#             result = result and check_valid(gen_list[idx])
-#         else:
-#             count_maybe_courses += 1
-#             count = 0
-#             if gen_list[idx] not in courses_list:
-#                 count += 1
-#         if count == count_maybe_courses:
-#             result = result and False
-#         idx += 1
-#
-#     return result
 
 def is_unlocked(courses_list, target_course):
     """Given a list of course codes a student has taken, return true if the target_course
@@ -238,29 +200,24 @@ def is_unlocked(courses_list, target_course):
     condition = re.split('(\W)', condition)
     condition = list(filter(lambda a: a != ' ' and a != '', condition))
 
-
+    # first make very course in the courses_list in lower case, this is easier for later process
     for i in range(len(courses_list)):
         courses_list[i] = courses_list[i].lower()
+
+    # get the final generated list
+    # in this list, elements are not forced as long as one of them are taken
+    # while elements in tuple have to be taken before, they are forced
+    # list represents course_one or course_two
+    # tuple represents course_one and course_two
     final_list = gen_list(courses_list, condition)
 
-    print(final_list)
+    # COMP1511 is a bit different, if we are given with an empty list, only COMP1511 is true
+    # so i decided to deal with this specifically
     if target_course != 'COMP1511':
         finial_return = check_valid(courses_list, final_list)
     else:
         finial_return = True
-    print(finial_return)
 
     return finial_return
 
-# is_unlocked([], ["COMP1511"])
-# is_unlocked([], ["COMP1531"])
-# is_unlocked([], ["COMP2511"])
-# is_unlocked([], ["COMP2121"])
-# is_unlocked([], ["COMP3151"])
-# is_unlocked([], ["COMP3900"])
-# is_unlocked([], ['COMP3901'])
-# is_unlocked([], 'COMP9301')
-# is_unlocked(["COMP1911", "MTRN2500"], "COMP2121")
-# print(gen_list([], ['comp6443', 'and', 'comp6843', 'and', 'comp6445', 'and', 'comp6845', 'and', 'comp6447']))
-# is_unlocked(["COMP1511", "COMP1521", "COMP1531", "COMP2521"], "COMP4161")
 is_unlocked(["COMP9417", "COMP9418", "COMP9447"], "COMP9491")
