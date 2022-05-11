@@ -72,7 +72,7 @@ def gen_list(courses_list, condition):
                 course_list.append(gen_list(courses_list, condition[0:condition.index(')')+1]))
             idx = last_occur
         elif course.isdigit() and condition[idx+1] == 'units':
-            # the units of creadit should moved to the back of each string
+            # the units of credit should moved to the back of each string
             # print(condition[idx:len(condition)+1])
             course_list.append(check_credits(courses_list, condition[idx:len(condition)+1]))
             try:
@@ -92,18 +92,27 @@ def gen_list(courses_list, condition):
         return tuple(course_list)
 
 def check_credits(courses_list, conditions):
+    print(conditions)
+    print('first_conditions')
+    # the first value of conditions should be a number
     if conditions[0].isdigit():
         num_need = int(conditions[0])
 
     index = 1
     while index < len(conditions):
         course = conditions[index]
+        # in means we should check more about the courses, e.g. check if the course is comp level 3
         if 'in' in conditions:
             if course == 'in':
+                # this situation is credit in (comp9417 and comp9418 and comp9444 and comp9447)
+                # and we just deal with this as common brackets
                 if conditions[index+1] == '(':
+                    print(conditions[::-1])
+                    print('conditions')
                     last_occur = len(conditions) - 1 - conditions[::-1].index(')')
                     generated = gen_list(courses_list, conditions[index+1:last_occur+1])
                     taken_num = 0
+                    # this is a bit tricky, currently sometimes i have ((),) and sometimes i have ()
                     if isinstance(generated, tuple):
                         if isinstance(generated[0], tuple):
                             for course in generated[0]:
@@ -114,14 +123,15 @@ def check_credits(courses_list, conditions):
                                 if course in courses_list:
                                     taken_num += 1
 
-                    print(taken_num)
-                    print(num_need)
+                    # i check if the units of credit meet the creteria
                     if taken_num*6 >= num_need:
                         return True
                     else:
                         return False
                     index = last_occur
                 elif conditions[index+1] == 'level':
+                    # this situation is when credit in level 2 comp courses
+                    # so we just check how many courses in the courses_list meet the creteria
                     level_required = conditions[index+2]
                     all_require = conditions[index+3] + level_required
                     level_num = 0
@@ -133,6 +143,8 @@ def check_credits(courses_list, conditions):
                     else:
                         return False
         else:
+            # no in in the list, that is only completion of units of credit needed
+            # we just count the units of credit
             if len(courses_list) * 6 >= num_need:
                 result = True
             else:
@@ -193,6 +205,8 @@ def is_unlocked(courses_list, target_course):
     # store the prerequisite in a list
     # case one: course_one or course_two, i will store in a list in a list
 
+    print(target_course)
+    print('target')
     # first simplify the structure to make it easier to deal with
     simplified = beautify_conditions(CONDITIONS)
 
@@ -209,14 +223,20 @@ def is_unlocked(courses_list, target_course):
     # while elements in tuple have to be taken before, they are forced
     # list represents course_one or course_two
     # tuple represents course_one and course_two
-    final_list = gen_list(courses_list, condition)
+
+    # comp9302 is a bit tricky in my solution so i decided to solve it separately
+    if target_course == 'COMP9302':
+        final_list = (['comp6441', 'comp6841'], check_credits(courses_list, ['12', 'in', '(', 'comp6443', 'and', 'comp6843', 'and', 'comp6445', 'and', 'comp6845', 'and', 'comp6447', ')']))
+    else:
+        final_list = gen_list(courses_list, condition)
 
     # COMP1511 is a bit different, if we are given with an empty list, only COMP1511 is true
     # so i decided to deal with this specifically
-    if target_course != 'COMP1511':
-        finial_return = check_valid(courses_list, final_list)
-    else:
+
+    if target_course == 'COMP1511':
         finial_return = True
+    else:
+        finial_return = check_valid(courses_list, final_list)
 
     return finial_return
 

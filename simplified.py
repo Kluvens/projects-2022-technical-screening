@@ -28,10 +28,10 @@
 'COMP4952': 'comp4951',
 'COMP4953': 'comp4952',
 'COMP9301': '12 units of credit in (comp6443, comp6843, comp6445, comp6845, comp6447)',
-'COMP9302': '(comp6441 or comp6841) and 12 units of credit in (comp6443, comp6843, comp6445, comp6845, comp6447)',
+'COMP9302': '(comp6441 or comp6841) and 12 units of credit in (comp6443 and comp6843 and comp6445 and comp6845 and comp6447)',
 'COMP9417': 'math1081 and ((comp1531 or comp2041) or (comp1927 or comp2521))',
 'COMP9418': 'math5836 or comp9417',
 'COMP9444': 'comp1927 or comp2521 or mtrn3500',
 'COMP9447': 'comp6441 or comp6841 or comp3441',
-'COMP9491': '18 units oc credit in (comp9417, comp9418, comp9444, comp9447)'
+'COMP9491': '18 units oc credit in (comp9417 and comp9418 and comp9444 and comp9447)'
 }
